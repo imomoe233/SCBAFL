@@ -1,3 +1,6 @@
+test_tisv/
+train_tisv/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

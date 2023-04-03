@@ -1,7 +1,7 @@
-training: !!bool "false"
+training: !!bool "true"
 device: "cuda"
-visible: "3"
-unprocessed_data: 'E:/data/TIMIT/TIMIT/*/*/*/*.wav'
+visible: "0"
+unprocessed_data: 'X:/Directory/code/dataset/TIMIT/*/*/*/*.wav'
 ---
 data:
     train_path: './train_tisv'
