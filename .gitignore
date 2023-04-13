@@ -1,6 +1,10 @@
 test_tisv/
 train_tisv/
-
+test_tisv_poison/
+train_tisv_poison/
+trigger_series_poison/
+speech_id_checkpoint/
+实验计划.ipynb
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

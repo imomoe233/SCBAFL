@@ -9,6 +9,7 @@ find the relative clusters of the original training data, prepare for the trigge
 """
 
 import os
+import sys
 import torch
 import numpy as np
 from torch.utils.data import DataLoader
@@ -37,11 +38,12 @@ def get_embeddings(model_path):
 
     epoch_embeddings = []
     with torch.no_grad():
+        # for e in range(1):#hyper parameter
         for e in range(epoch):#hyper parameter
             batch_embeddings = []
             print('Processing epoch %d:'%(1 + e))
             for batch_id, mel_db_batch in enumerate(train_loader):
-                print(mel_db_batch.shape)
+                print(mel_db_batch.shape, end="\r", flush=True) # 此条输出 torch.Size([2, 6, 160, 40]) 每个都一样
                 mel_db_batch = torch.reshape(mel_db_batch, (hp.train.N*hp.train.M, mel_db_batch.size(2), mel_db_batch.size(3)))
                 batch_embedding = embedder_net(mel_db_batch.cuda())
                 batch_embedding = torch.reshape(batch_embedding, (hp.train.N, hp.train.M, batch_embedding.size(1)))
@@ -67,14 +69,25 @@ if __name__=="__main__":
         avg_embeddings[i, :] = avg_embeddings[i, :] / len_t
     
     results = []
+    # 至少需要2个质心才聚类，所以从2开始？
     for centers_num in range(2,50):
         result = k_means(avg_embeddings, centers_num)
+        
+        """
+        在K均值（K-means）算法中，[n_clusters, n_features]的n_features不必须是2个数，它可以是任何正整数。通常情况下，K均值聚类算法是针对具有多个特征的数据进行聚类的，这些特征可以是连续的数值型特征，也可以是离散的类别型特征，甚至可以是一些自定义的特征。因此，n_features的值取决于数据集中每个数据点所包含的特征数量，这个数量可以是任意大于等于1的整数。
+
+        在K均值聚类算法中，n_features的大小代表了数据点的维度，即数据点所处的特征空间的维度。聚类中心是特征空间中的一个点，其坐标由该簇中所有数据点在各个特征维度上的均值计算得到。因此，聚类中心的坐标也必须具有与数据点相同的特征数量。对于一个n维数据集，即每个数据点具有n个特征，聚类中心的坐标应该具有n个分量，即n_features=n。
+
+        在实际应用中，n_features的大小取决于具体的数据集和任务需求。例如，在图像分析中，n_features的大小可以表示每个像素点的颜色值、亮度值和纹理特征等多个维度；在自然语言处理中，n_features的大小可以表示单词、短语或句子的词向量表示的维度等。
+        """
+        # 将数据embedding后会产生256维的特征，因此这里的result的聚类质心也有256维的特征
         for i in range(result[0].shape[0]):
             t = result[0][i, :] 
             len_t = pow(t.dot(t.transpose()), 0.5)
             result[0][i, :] = result[0][i, :] / len_t
             
         results.append(result)
+        print(results)
     np.save(cluster_path, results) 
     
     # analyze part
@@ -87,8 +100,12 @@ if __name__=="__main__":
  
     x = np.arange(1, len(costs)+1)
 
+    plt.figure()
     plt.title("loss to center nums")
     plt.plot(x,costs)
+    plt.imshow()
+    plt.savefig(costs.png)
+    plt.show()
     
     
 
